@@ -1,11 +1,13 @@
 package przeciwnicy;
 
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 import flixel.FlxG;
 import postacie.Hero;
 import bronie.Miecz;
+import utility.Zdrowie;
 
 class Walker extends Potwor
 {
@@ -13,6 +15,7 @@ class Walker extends Potwor
     public static var HEIGHT(default, never):Int = 32;
 
     public static var SPEED(default, never):Float = 100;
+    public static var GRAVITY(default, never):Float = 200;
 
     public var zasieg:Int = 150;
     public var start_x:Int;
@@ -25,6 +28,7 @@ class Walker extends Potwor
     public var attack_deley:Int = -1;
     public var miecz_x:Float;
     public var miecz_y:Float;
+    private var health_bar:FlxTypedGroup<Zdrowie>;
 
     override public function new(x_pos, y_pos)
         {
@@ -34,7 +38,20 @@ class Walker extends Potwor
             makeGraphic(WIDTH, HEIGHT, FlxColor.RED);
             health = 3;
             velocity.x = SPEED;
+            velocity.y = GRAVITY;
+            miecz = new Miecz(x + width, y + height/2, FlxColor.ORANGE, FlxObject.RIGHT);
+            miecz.kill();
             facing = FlxObject.RIGHT;
+            health_bar = new FlxTypedGroup<Zdrowie>();
+            var zycie:Int = 3;
+            var licznik = 0;
+            for(i in 0...zycie)
+                {
+                    var serduszko = new Zdrowie(x_pos + licznik, y_pos - 15);
+                    licznik += 10;
+                    health_bar.insert(i, serduszko);
+                }
+        FlxG.state.add(health_bar);
         }
     public function moveDirection()
         {
@@ -153,6 +170,26 @@ class Walker extends Potwor
                         }
                 }
         }
+    private function ruch(przedmiot:FlxObject)
+        {
+            przedmiot.velocity.x = velocity.x;
+            przedmiot.y = y - 15;
+        }
+    private function health_bar_move()
+        {
+            health_bar.forEach(ruch);
+        }
+    override public function hit()
+        {
+            if(wrazliwy)
+                {
+                    health--;
+                    countdown = 120;
+                    wrazliwy = false;
+                    var serduszko = health_bar.getFirstAlive();
+                    serduszko.kill();
+                }
+        }
     override public function update(elapsed:Float)
         {
             moveDirection();
@@ -160,6 +197,7 @@ class Walker extends Potwor
             chechHero();
             prepare();
             atak();
+            health_bar_move();
             super.update(elapsed);
         }
 }

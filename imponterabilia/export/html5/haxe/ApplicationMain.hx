@@ -32,7 +32,7 @@ class ApplicationMain
 
 		ManifestResources.init(config);
 
-		app.meta["build"] = "227";
+		app.meta["build"] = "172";
 		app.meta["company"] = "HaxeFlixel";
 		app.meta["file"] = "imponterabilia";
 		app.meta["name"] = "imponterabilia";
@@ -56,7 +56,7 @@ class ApplicationMain
 			maximized: false,
 			minimized: false,
 			parameters: {},
-			resizable: true,
+			resizable: false,
 			title: "imponterabilia",
 			width: 640,
 			x: null,
